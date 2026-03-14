@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyLift | study Lift </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <style>
+        body { background-color: #f8faff; font-family: sans-serif; }
+        .subject-card { transition: all 0.2s; cursor: pointer; }
+        .subject-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <nav class="bg-white border-b p-4 flex justify-between items-center px-8">
+        <div class="text-2xl font-bold text-indigo-700">STUDY HUB</div>
+        <div class="flex gap-6 items-center">
+            <button onclick="renderPage('about')" class="text-gray-600">About</button>
+            <button onclick="renderPage('contact')" class="text-gray-600">Contact</button>
+            <a href="/admin/" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium">Admin</a>
+        </div>
+    </nav>
+
+    <main id="app" class="max-w-2xl mx-auto py-10 px-4">
+        </main>
+
+    <footer class="text-center py-10 text-gray-400 text-sm border-t mt-10">
+        © 2024 Study Lift. All rights reserved.
+    </footer>
+
+    <script>
+        // PAGE ROUTING LOGIC
+        async function renderPage(page) {
+            const app = document.getElementById('app');
+            
+            if (page === 'home') {
+                app.innerHTML = `
+                    <div class="text-center mb-10">
+                        <h1 class="text-4xl font-extrabold text-slate-900">Learn clearly. Study smart.</h1>
+                        <p class="text-gray-500 mt-2">Clear, structured content designed for exam success</p>
+                    </div>
+                    <div class="flex items-center mb-6 text-xl font-bold text-slate-800">
+                        <span class="mr-2">📚</span> Select a Subject
+                    </div>
+                    <div id="subject-list" class="grid gap-4">Loading subjects...</div>
+                `;
+                loadSubjects();
+            } 
+            
+            else if (page === 'about') {
+                app.innerHTML = `
+                    <button onclick="renderPage('home')" class="text-indigo-600 mb-4">← Back</button>
+                    <div class="bg-white p-8 rounded-xl shadow-sm border">
+                        <h2 class="text-2xl font-bold mb-4">About EDU HUB</h2>
+                        <p class="mb-4 text-gray-700"><strong>EDU HUB</strong> is a focused, text-based learning platform.</p>
+                        <ul class="space-y-2 text-gray-600">
+                            <li>• Organized subjects and exercises</li>
+                            <li>• Mathematical formulas</li>
+                            <li>• Exam-ready content</li>
+                        </ul>
+                    </div>`;
+            }
+
+            else if (page === 'contact') {
+                app.innerHTML = `
+                    <button onclick="renderPage('home')" class="text-indigo-600 mb-4">← Back</button>
+                    <div class="bg-white p-8 rounded-xl shadow-sm border">
+                        <h2 class="text-2xl font-bold mb-4">Contact</h2>
+                        <p><strong>Email:</strong> contact@eduhub.edu</p>
+                        <p><strong>Platform:</strong> Online - Worldwide</p>
+                    </div>`;
+            }
+        }
+
+        // DATA LOADING LOGIC (Fixes the "Undefined" bug)
+        async function loadSubjects() {
+            try {
+                const response = await fetch('/data/subjects.json');
+                const data = await response.json();
+                const list = document.getElementById('subject-list');
+                list.innerHTML = ''; // Clear loading text
+
+                data.forEach(sub => {
+                    list.innerHTML += `
+                        <div class="subject-card bg-white p-6 rounded-xl border flex flex-col items-start">
+                            <div class="bg-indigo-100 p-3 rounded-lg text-2xl mb-3">${sub.icon || '📚'}</div>
+                            <h3 class="text-xl font-bold text-slate-800">${sub.title || 'Unknown'}</h3>
+                            <p class="text-gray-400 text-sm">${sub.description || 'Chapters & exercises'}</p>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                document.getElementById('subject-list').innerHTML = "Error loading data. Make sure data/subjects.json exists.";
+            }
+        }
+
+        // Initial Load
+        renderPage('home');
+    </script>
+</body>
+</html>
